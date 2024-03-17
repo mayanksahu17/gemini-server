@@ -49,7 +49,9 @@ const sendMail = async(req,res)=>{
 app.post("/api/v1/generate", async (req, res) => {
   try {
     // Extract the prompt from the request body
-    const prompt = req.body.prompt;
+    let prompt = "Extract the key messages and interactions from the Google Meet transcript.Summarize the conversation into actionable insights and key takeaways.Highlight important points, decisions made, action items, and any follow-up tasks.Create a bulleted list of the most significant topics discussed during the meeting.Ensure clarity, brevity, and relevance in the generated summary and bullet points.Provide a structured and organized output that can be easily understood by stakeholders. "
+    
+    prompt += req.body.prompt;
 
     // For text-only input, use the gemini-pro model
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
@@ -58,8 +60,8 @@ app.post("/api/v1/generate", async (req, res) => {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = await response.text();
-    var jsonData = JSON.parse(text)
-    fs.writeFileSync('data.json',jsonData)
+    // var jsonData = JSON.parse(text)
+    // fs.writeFileSync('data.json',jsonData)
     
     console.log(text);
     
