@@ -1,10 +1,50 @@
 import express from 'express';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import nodemailer from 'nodemailer';
+import cors from "cors"
 const app = express();
 const genAI = new GoogleGenerativeAI("AIzaSyDak6pLoKL5Kz8BvewuVhoShdZITEIkeow"); // Replace YOUR_API_KEY with your actual API key
+import fs from 'fs'
 
 app.use(express.json());
+
+app.use(cors())
+
+const sendMail = async(req,res)=>{
+  try {
+
+    const {email} = req.params
+    var transport = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "6771c317cd9753",
+        pass: "640b00feb7e70e"
+      }
+    });
+ 
+    const mailOptions = {
+      from: "mayank0real0world@gmail.com",
+      to: email,
+      subject: 'Generated Content',
+      text: "gerwg"
+    };
+
+    const mailresponse = await transport.sendMail
+    (mailOptions);
+    return mailresponse;
+    
+    
+  } catch (error) {
+    console.log(error);
+    throw new Error(error);
+  }
+}
+
+
+
+
+
 
 app.post("/api/v1/generate", async (req, res) => {
   try {
@@ -18,6 +58,10 @@ app.post("/api/v1/generate", async (req, res) => {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = await response.text();
+    var jsonData = JSON.parse(text)
+    fs.writeFileSync('data.json',jsonData)
+    
+    console.log(text);
     
     // Send the generated content as the response
     res.status(200).json({ generatedContent: text });
@@ -26,6 +70,11 @@ app.post("/api/v1/generate", async (req, res) => {
     res.status(500).json({ error: "An error occurred while generating content." });
   }
 });
+
+app.get("/api/v1/:email",sendMail);
+
+
+
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
