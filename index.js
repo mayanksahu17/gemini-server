@@ -57,7 +57,7 @@ app.post("/api/v1/generate", async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // Generate content based on the provided prompt
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent(req.body.prompt);
     const response = await result.response;
     const text = await response.text();
     // var jsonData = JSON.parse(text)
